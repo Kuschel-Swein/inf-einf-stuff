@@ -109,7 +109,7 @@ Verwenden Sie dazu `python3 check.py -t <TeilaufgabenNr>`, nachdem Sie Ihr Progr
 #### Webbrowser
 
 Um das Testen interaktiver zu gestalten, können Sie das mitgelieferte Skript `server.py` verwenden.
-Verwenden Sie dazu `python3 server.py` nachdem Sie Ihr Programm mit `make password` kompiliert haben. Es sollte sich nun automatisch eine Webseite öffnen, auf der Sie verschiedene Passwörter zum Testen in das Eingabefeld eingeben können. Um das Programm wieder zu verlassen, drücken Sie `STRG + C` in dem Terminal, in dem Sie das Skript gestartet haben.
+Verwenden Sie dazu `python3 server.py` nachdem Sie Ihr Programm mit `make password` kompiliert haben. Es sollte sich nun automatisch eine Webseite öffnen, auf der Sie verschiedene Passwörter zum Testen in das Eingabefeld eingeben können. Um das Programm wieder zu verlassen, drücken Sie <kbd>Strg</kbd> + <kbd>C</kbd> in dem Terminal, in dem Sie das Skript gestartet haben.
 
 > ℹ️ Werfen Sie gerne einen Blick in das Python Skript nachdem wir in der Vorlesung Python erreicht haben!
 
