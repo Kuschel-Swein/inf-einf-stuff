@@ -39,6 +39,5 @@ echo -e "${BOLD}   cd lab-password${RESET}"
 echo -e "${BOLD}   touch password.c${RESET}"
 echo -e "${BOLD}   code password.c${RESET}"
 
-# Self-destruct
-echo -e "${BLUE}🧹 Cleaning up...${RESET}"
-rm -- "$0" && echo -e "${GREEN}✅ Cleanup complete! Goodbye! 👋${RESET}"
+# End the script
+echo -e "${GREEN}✅ Goodbye! 👋${RESET}"
