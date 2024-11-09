@@ -10,7 +10,7 @@ BOLD='\033[1m'
 RESET='\033[0m'
 
 # URL of the ZIP archive
-URL="http://127.0.0.1:3000/code/lab-password.zip"
+URL="https://github.com/Kuschel-Swein/inf-einf-labs/raw/main/password/material/lab-password.zip"
 
 # the name of the zip file that has been downloaded
 ZIP_FILE="lab-password.zip"
