@@ -4,30 +4,30 @@ import check50.c
 TEST_PASSWORDS = [
     ('hello', 1),  # Fails at Task 1 due to lack of uppercase, number, and symbol
     ('H3!lo', 3),  # Fails at Task 3 due to length requirement (Task 2 would pass)
-    ('Pas123456!'),  # Passes all tasks
+    ('Pas123456!', None),  # Passes all tasks
     ('P@ssw0rd', 3),      # Fails at Task 3 due to length requirement
     ('1234abcd', 1),      # Fails at Task 1 due to lack of uppercase and symbol
-    ('!@#ABC123def'),  # Passes all tasks
+    ('!@#ABC123def', None),  # Passes all tasks
     ('1111aAaa!!!!', 4),  # Fails at Task 4 due to consecutive same characters
-    ('QwErTy123!@'),  # Passes all tasks
+    ('QwErTy123!@', None),  # Passes all tasks
     ('!!AAaa11bb', 4),    # Fails at Task 4 due to consecutive same characters
-    ('AbC!123xyz@'),  # Passes all tasks
+    ('AbC!123xyz@', None),  # Passes all tasks
     ('admin', 1),  # Fails at Task 1 due to lack of uppercase, number, and symbol
-    ('letMein123!'),   # Passes all tasks
-    ('pas5word!23A'),  # Passes all tasks
-    ('abcDE!ghi1234'),  # Passes all tasks
-    ('P@$W0rD12345'),  # Passes all tasks
+    ('letMein123!', None),   # Passes all tasks
+    ('pas5word!23A', None),  # Passes all tasks
+    ('abcDE!ghi1234', None),  # Passes all tasks
+    ('P@$W0rD12345', None),  # Passes all tasks
     ('ABCabc123', 1),     # Fails at Task 1 due to lack of symbol
     ('Abc@1233Abc_', 4),  # Fails at Task 4 due to consecutive same characters
     ('12abc!XYZ', 3),     # Fails at Task 3 due to length requirement
-    ('mySecret2021!'),  # Passes all tasks
-    ('qwerty!@123ABC'),  # Passes all tasks
-    ('dragon!@123ABC'),  # Passes all tasks
+    ('mySecret2021!', None),  # Passes all tasks
+    ('qwerty!@123ABC', None),  # Passes all tasks
+    ('dragon!@123ABC', None),  # Passes all tasks
     ('Hello123!!', 4),    # Fails at Task 4 due to consecutive same characters
-    ('Zyx!9876lmNOP'),  # Passes all tasks
+    ('Zyx!9876lmNOP', None),  # Passes all tasks
     ('Test@123', 3),      # Fails at Task 3 due to length requirement
-    ('R@nd0mPasw0rd'),  # Passes all tasks
-    ('$up3r$trongP@s5'),  # Passes all tasks
+    ('R@nd0mPasw0rd', None),  # Passes all tasks
+    ('$up3r$trongP@s5', None),  # Passes all tasks
     ('abc123def!', 1)   # Fails at Task 1 due to lack of uppercase
 ]
 
