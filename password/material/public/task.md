@@ -50,7 +50,7 @@ Auch hier sollte der Benutzer über das Ergebnis der Prüfung informiert werden.
 
 ## Testen
 
-> ℹ️ Da diese Aufgabe stark angepasst wurde, können Sie `check50` leider nicht verwenden.
+> ℹ️ Sie können auch `check50` zum Testen verwenden, siehe [Kommandozeile](#Kommandozeile) weiter unten.
 
 Ihr Programm sollte sich, je nach Teilaufgabe, wie in den folgenden Beispielen verhalten.
 
@@ -101,10 +101,13 @@ Ihr Programm sollte sich, je nach Teilaufgabe, wie in den folgenden Beispielen v
 
 #### Befehlszeile
 
-Damit Sie nicht jedes Passwort einzeln eintippen müssen, können Sie das mitgelieferte Skript `check.py` verwenden.
-Verwenden Sie dazu `python3 check.py -t <TeilaufgabenNr>`, nachdem Sie Ihr Programm mit `make password` kompiliert haben.
+Verwenden Sie dazu je nach Teilaufgabe die folgenden Befehle, um Ihr Programm mit `check50` zu überprüfen.
 
-> ℹ️ Werfen Sie gerne einen Blick in das Python Skript nachdem wir in der Vorlesung Python erreicht haben!
+-   **Teilaufgabe 1:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a1`
+-   **Teilaufgabe 2:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a2`
+-   **Teilaufgabe 3:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a3`
+-   **Teilaufgabe 4:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a4`
+-   **Teilaufgabe 5:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a5`
 
 #### Webbrowser
 
