@@ -4,6 +4,8 @@
 # Cool, you are interested in python?
 # After the entire module, you should be able to write most of this file's content on your own!
 #
+# Currenty you do not have to understand ANYTHING thats written inside this file.
+#
 
 from flask import Flask, request
 from threading import Timer
