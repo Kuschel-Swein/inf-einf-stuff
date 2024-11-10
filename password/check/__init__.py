@@ -92,7 +92,8 @@ def passwords(task, should_be_valid, include_arguments=False):
         try:
             check50.run('./password').stdin(password).stdout(text).exit()
 
-            if include_arguments:
+            # '$' cannot be reliably used in arguments, thus it will be skipped here
+            if include_arguments and not '$' in password:
                 check50.run('./password ' + password).stdout(text).exit()
 
         except check50.Failure as f:
