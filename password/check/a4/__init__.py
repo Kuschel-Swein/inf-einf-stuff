@@ -1,7 +1,7 @@
 import check50
 import check50.c
 
-TASK = 5
+TASK = 4
 
 check = check50.import_checks('../')
 
