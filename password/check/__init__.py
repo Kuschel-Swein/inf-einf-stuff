@@ -67,15 +67,8 @@ def _get_relevant_passwords(task, is_failing):
     return relevant
 
 
-def get_passing_passwords(task):
-    return _get_relevant_passwords(task, is_failing=False)
-
-
-def get_failing_passwords(task):
-    return _get_relevant_passwords(task, is_failing=True)
-
-
-def check_passwords(passwords, should_be_valid, include_arguments=False):
+def passwords(task, should_be_valid, include_arguments=False):
+    passwords = _get_relevant_passwords(task, is_failing=not should_be_valid)
     text = 'valid' if should_be_valid else 'uppercase letter, lowercase letter, number and symbol'
 
     for password in passwords:

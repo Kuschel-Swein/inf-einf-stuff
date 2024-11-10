@@ -1,6 +1,7 @@
 import check50
 import check50.c
-from .. import get_passing_passwords, get_failing_passwords, check_passwords
+
+check = check50.import_checks('../')
 
 
 @check50.check()
@@ -15,9 +16,9 @@ def compiles():
 
 @check50.check(compiles)
 def accepts_passwords():
-    check_passwords(passwords=get_passing_passwords(1), should_be_valid=True)
+    check.passwords(task=1, should_be_valid=True)
 
 
 @check50.check(compiles)
 def rejects_passwords():
-    check_passwords(passwords=get_failing_passwords(1), should_be_valid=False)
+    check.passwords(task=1, should_be_valid=False)
