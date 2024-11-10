@@ -56,7 +56,7 @@ def _get_relevant_passwords(task, is_failing):
 
         # Check if we should include that case yet
         if skip_before_task is None or task >= skip_before_task:
-            should_include = fails_at_task is None or task < fails_at_task
+            should_include = fails_at_task is None or task <= fails_at_task
 
             if is_failing:
                 should_include = not should_include
