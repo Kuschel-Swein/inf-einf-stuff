@@ -16,7 +16,7 @@ URL="https://kuschel-swein.github.io/inf-einf-labs/password/material/lab-passwor
 ZIP_FILE="lab-password.zip"
 
 # Failsafe check to not brick the local environment
-if [ -f "./private/guide.md" ]; then
+if [ -f "../../private/guide.md" ]; then
   echo -e "${RED}⚠️  Failsafe triggered! Cannot run in local environment. Exiting script.${RESET}"
   exit 1
 fi

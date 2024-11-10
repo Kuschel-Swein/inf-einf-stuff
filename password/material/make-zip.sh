@@ -4,4 +4,4 @@ if [ -f lab-password.zip ]; then
 fi
 
 # And recreate
-zip -j lab-password.zip ./public/task.pdf ../check.py ../server.py
+zip -j lab-password.zip ./public/task.pdf ./public/scripts/check.py ./public/scripts/server.py
