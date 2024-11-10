@@ -1,9 +1,9 @@
 # Aufgabenmaterial herunterladen
 
-Um das Aufgabenmeterial für [Password](../) herunterzuladen, gib folgenden Befehl in _ein neues Terminal_ in deinem Codespace ein:
+Um das Aufgabenmeterial für [Passwort](../) herunterzuladen, gib folgenden Befehl in _ein neues Terminal_ in deinem Codespace ein:
 
 ```
-wget -O - https://kuschel-swein.github.io/inf-einf-labs/password/material/public/scripts/setup.sh | bash
+wget -O - https://inf-lab.dev/inf-einf-labs/password/material/public/scripts/setup.sh | bash
 ```
 
 <details>
