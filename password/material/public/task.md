@@ -50,7 +50,7 @@ Auch hier sollte der Benutzer über das Ergebnis der Prüfung informiert werden.
 
 ## Testen
 
-> ℹ️ Sie können auch `check50` zum Testen verwenden, siehe [Kommandozeile](#Kommandozeile) weiter unten.
+> ℹ️ Sie können auch `check50` zum Testen verwenden, siehe [Befehlszeile](#befehlszeile) weiter unten.
 
 Ihr Programm sollte sich, je nach Teilaufgabe, wie in den folgenden Beispielen verhalten.
 
