@@ -67,6 +67,23 @@ def _get_relevant_passwords(task, is_failing):
     return relevant
 
 
+def exists():
+    check50.exists('password.c')
+
+
+def compiles():
+    check50.run('make password').exit(0)
+
+
+def accepts_arguments():
+    try:
+        check50.run('./password a').exit()
+
+    except check50.Failure as f:
+        raise check50.Failure(
+            'Expected the program to accept command line arguments.', help=f.payload['help'])
+
+
 def passwords(task, should_be_valid, include_arguments=False):
     passwords = _get_relevant_passwords(task, is_failing=not should_be_valid)
     text = 'valid' if should_be_valid else 'uppercase letter, lowercase letter, number and symbol'
