@@ -36,16 +36,16 @@ TEST_PASSWORDS = [
     ('abc123def!', 1, None),     # Fails at Task 1 due to lack of uppercase
 
     # Ten most common passwords
-    ('123456', 5, 5),
-    ('password', 5, 5),
-    ('12345678', 5, 5),
-    ('qwerty', 5, 5),
-    ('123456789', 5, 5),
-    ('12345', 5, 5),
-    ('1234', 5, 5),
-    ('111111', 5, 5),
-    ('1234567', 5, 5),
-    ('dragon', 5, 5)
+    ('123456', 6, 5),
+    ('password', 6, 5),
+    ('12345678', 6, 5),
+    ('qwerty', 6, 5),
+    ('123456789', 6, 5),
+    ('12345', 6, 5),
+    ('1234', 6, 5),
+    ('111111', 6, 5),
+    ('1234567', 6, 5),
+    ('dragon', 6, 5)
 ]
 
 
@@ -56,7 +56,7 @@ def _get_relevant_passwords(task, is_failing):
 
         # Check if we should include that case yet
         if skip_before_task is None or task >= skip_before_task:
-            should_include = fails_at_task is None or task <= fails_at_task
+            should_include = fails_at_task is None or task < fails_at_task
 
             if is_failing:
                 should_include = not should_include
