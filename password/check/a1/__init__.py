@@ -1,6 +1,6 @@
 import check50
 import check50.c
-from check import get_passing_passwords, get_failing_passwords, check_passwords
+from .. import get_passing_passwords, get_failing_passwords, check_passwords
 
 
 @check50.check()
