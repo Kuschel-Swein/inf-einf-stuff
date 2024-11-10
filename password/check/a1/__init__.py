@@ -11,7 +11,7 @@ def exists():
 
 @check50.check(exists)
 def compiles():
-    check50.c.compile('./password', lcs50=True)
+    check50.run('make password').exit(0)
 
 
 @check50.check(compiles)
