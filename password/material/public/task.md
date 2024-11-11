@@ -37,7 +37,7 @@ Auch wenn das Passwort `!1Ab` alle bisherigen Richtlinien erfüllt, ist es nicht
 
 ### Teilaufgabe 4
 
-Obwohl das Programm nun Passwörter wie `!1Ab` ablehnt, akzeptiert es immer noch Passwörter wie `!!11AAbb`, die nicht viel sicherer sind als das erste.
+Obwohl das Programm nun Passwörter wie `!1Ab` ablehnt, akzeptiert es immer noch Passwörter wie `!!!111AAAbbb`, die nicht viel sicherer sind als das erste.
 Passen Sie nun die Funktion `valid` so an, dass auch keine Passwörter mehr akzeptiert werden, in denen die gleichen Zeichen aufeinander folgen.
 Passen Sie auch die Fehlermeldung entsprechend an.
 
