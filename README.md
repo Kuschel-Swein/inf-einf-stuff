@@ -1,9 +1,9 @@
 # inf-einf-labs
 
-This repository contains various material for the Inf-Einf lab sessions.
+Diese Seite enthält verschiedene Materialien für meine Inf-Einf-Labs.
 
-> [!NOTE]
-> Due to the various preparations needed for lab sessions, this repository will be _private_ most of the time.
+> [!IMPORTANT]
+> Der Inhalt dieser Seite wurde nicht offiziell vom Lehrstuhl veröffentlicht. Die offiziellen Inhalte sind auf der Website [inf.zone](https://inf.zone) zu finden.
 
 ## Labs
 
