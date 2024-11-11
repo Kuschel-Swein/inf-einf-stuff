@@ -93,6 +93,16 @@
             const $fileInput = document.getElementById('file-input');
             const $setupStyles = document.getElementById('setup-styles');
 
+            function openDetails() {
+                const detailsElements = document.querySelectorAll(
+                    'details:not([data-closed])'
+                );
+
+                for (const $details of detailsElements) {
+                    $details.open = true;
+                }
+            }
+
             function renderFile(fileName, fileContent) {
                 const options = jsYaml.load(
                     fileContent.match(FRONT_MATTER_REGEX)?.[1]
@@ -124,9 +134,12 @@
 
                 reader.onload = () => {
                     $setupStyles.remove();
+
                     renderFile(file.name, reader.result);
+                    openDetails();
 
                     print();
+
                     location.reload();
                 };
 
