@@ -56,13 +56,13 @@ def compiles():
     check50.run('make password').exit(0)
 
 
-def accepts_arguments():
+def supports_arguments():
     try:
         check50.run('./password a').exit()
 
     except check50.Failure as f:
         raise check50.Failure(
-            'Expected the program to accept command line arguments.', help=f.payload['help'])
+            'Expected the program to support command line arguments.', help=f.payload['help'])
 
 
 def passwords(task, should_be_valid, include_arguments=False):
