@@ -43,9 +43,12 @@
 
             #content {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
+                text-align: center;
                 font-size: 2rem;
+                padding: 1rem;
             }
 
             #file-input {
@@ -55,10 +58,11 @@
     </head>
     <body>
         <div id="content">
-            <p>Click to select the pdf file or drop it onto the page.</p>
+            <p>Click to select the markdown file or drop it onto the page.</p>
             <input
                 id="file-input"
                 type="file"
+                accept=".md"
             />
         </div>
         <script src="https://cdn.jsdelivr.net/npm/marked-highlight@2.2.1/lib/index.umd.js"></script>
@@ -71,12 +75,6 @@
             import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/highlight.min.js';
 
             const FRONT_MATTER_REGEX = /^---\s*\n([\s\S]+?)\n---\s*\n/;
-            const FILES = {
-                './password/material/public/task.md':
-                    'Inf-Einf-B Übung: Passwort',
-                './password/material/private/guide.md':
-                    'Inf-Einf-B Passwort Lab: Anleitung',
-            };
 
             const marked = new Marked(
                 markedHighlight.markedHighlight({
@@ -112,6 +110,14 @@
             }
 
             function selectedFile(file) {
+                if (!file.name.endsWith($fileInput.accept)) {
+                    alert(
+                        `Cannot load "${file.name}" because its no markdown file.`
+                    );
+
+                    return;
+                }
+
                 $fileInput.disabled = true;
 
                 const reader = new FileReader();
@@ -121,6 +127,12 @@
                     renderFile(file.name, reader.result);
 
                     print();
+                    location.reload();
+                };
+
+                reader.onerror = () => {
+                    alert(`Could not load "${file.name}": ${reader.error}`);
+
                     location.reload();
                 };
 
