@@ -1,3 +1,8 @@
+---
+pdf:
+    title: 'Inf-Einf-B Übung: Passwort'
+---
+
 # Passwort
 
 > Diese Aufgabe ist eine abgewandelte Version des [Password Practice Problems von CS50](https://cs50.harvard.edu/x/2024/practice/password/).
