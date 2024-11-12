@@ -36,8 +36,6 @@
                     CryptoJS.enc.Utf8
                 );
 
-            document.getElementById('content').innerHTML = decrypted;
-
             return {
                 ...values,
                 code: decrypt(values.code),
@@ -53,7 +51,7 @@
     const url = new URL(location.href);
     const key = url.searchParams.get('key');
 
-    require(['vs/editor/editor.main', `loader`], (_, loader) => {
+    require(['vs/editor/editor.main', 'loader'], (_, loader) => {
         function createEditor({ name, code, language, annotations }) {
             document.title = name;
             $editor.innerHTML = '';
