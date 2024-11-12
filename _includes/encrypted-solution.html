@@ -26,7 +26,7 @@
 
     require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
         function createEditor({ code, language, annotations }) {
-            $editor.parentElement.style.border = '1px solid #eaecef';
+            $editor.parentElement.style.outline = '1px solid #eaecef';
             $editor.style.height = '30vh';
             $editor.innerHTML = '';
 
