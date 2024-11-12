@@ -1,0 +1,4 @@
+remote_theme: pages-themes/primer@v0.6.0
+lang: 'de-DE'
+plugins:
+- jekyll-remote-theme

@@ -1,0 +1,14 @@
+---
+---
+@import "{{ site.theme }}";
+
+@media print {
+    .no-print,
+    .anchorjs-link {
+        display: none;
+    }
+
+    pre.highlight > code {
+        white-space: pre-line;
+    }
+}

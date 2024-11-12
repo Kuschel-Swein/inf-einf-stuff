@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/pixelbrackets/gfm-stylesheet/dist/gfm.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
+        />
+        <title>Select markdown file...</title>
+        <style>
+            html,
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                    'Noto Sans', Helvetica, Arial, sans-serif,
+                    'Apple Color Emoji', 'Segoe UI Emoji';
+            }
+
+            .hljs {
+                background-color: transparent;
+            }
+
+            code {
+                white-space: pre-wrap !important;
+            }
+        </style>
+        <style id="setup-styles">
+            #content,
+            #file-input {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 100vw;
+            }
+
+            #content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-size: 2rem;
+                padding: 1rem;
+            }
+
+            #file-input {
+                opacity: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            <p>Click to select the markdown file or drop it onto the page.</p>
+            <input
+                id="file-input"
+                type="file"
+                accept=".md"
+            />
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/marked-highlight@2.2.1/lib/index.umd.js"></script>
+        <script
+            type="module"
+            defer
+        >
+            import { Marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+            import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/+esm';
+            import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/highlight.min.js';
+
+            const FRONT_MATTER_REGEX = /^---\s*\n([\s\S]+?)\n---\s*\n/;
+
+            const marked = new Marked(
+                markedHighlight.markedHighlight({
+                    emptyLangClass: 'hljs',
+                    langPrefix: 'hljs language-',
+                    highlight(code, lang, info) {
+                        const language = hljs.getLanguage(lang)
+                            ? lang
+                            : 'plaintext';
+
+                        return hljs.highlight(code, { language }).value;
+                    },
+                })
+            );
+
+            const $fileInput = document.getElementById('file-input');
+            const $setupStyles = document.getElementById('setup-styles');
+
+            function openDetails() {
+                const detailsElements = document.querySelectorAll(
+                    'details:not([data-closed])'
+                );
+
+                for (const $details of detailsElements) {
+                    $details.open = true;
+                }
+            }
+
+            function renderFile(fileName, fileContent) {
+                const options = jsYaml.load(
+                    fileContent.match(FRONT_MATTER_REGEX)?.[1]
+                );
+
+                document.title = fileName;
+
+                if (options && options.pdf && options.pdf.title) {
+                    document.title = options.pdf.title;
+                }
+
+                document.getElementById('content').innerHTML = marked.parse(
+                    fileContent.replace(FRONT_MATTER_REGEX, '')
+                );
+            }
+
+            function selectedFile(file) {
+                if (!file.name.endsWith($fileInput.accept)) {
+                    alert(
+                        `Cannot load "${file.name}" because its no markdown file.`
+                    );
+
+                    return;
+                }
+
+                $fileInput.disabled = true;
+
+                const reader = new FileReader();
+
+                reader.onload = () => {
+                    $setupStyles.remove();
+
+                    renderFile(file.name, reader.result);
+                    openDetails();
+
+                    print();
+
+                    location.reload();
+                };
+
+                reader.onerror = () => {
+                    alert(`Could not load "${file.name}": ${reader.error}`);
+
+                    location.reload();
+                };
+
+                reader.readAsText(file);
+            }
+
+            $fileInput.addEventListener('change', () =>
+                selectedFile($fileInput.files[0])
+            );
+        </script>
+    </body>
+</html>
