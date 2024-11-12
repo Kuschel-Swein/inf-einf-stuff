@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>Code Annotations</title>
+        <style>
+            html,
+            body {
+                padding: 0;
+                margin: 0;
+            }
+
+            #editor {
+                font-family: sans-serif;
+                width: 100%;
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="editor">⏳ Loading, please wait...</div>
+
+        <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js"></script>
+        <script>
+            const LOADERS = [];
+
+            require.config({
+                paths: {
+                    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs',
+                },
+            });
+
+            const showError = message => {
+                alert(message);
+                location.reload();
+            };
+        </script>
+
+        <script>
+            define('loader/markdown-solution', () => {
+                const parseRange = text => {
+                    const [start, end] = text.split('-').map(Number);
+
+                    return end ? [start, end] : [start, start];
+                };
+
+                return async url => {
+                    const solutionUrl = url.searchParams.get('solutionUrl');
+                    const name = url.searchParams.get('name');
+                    const language = url.searchParams.get('language');
+
+                    if (!solutionUrl || !name || !language) {
+                        showError(
+                            'Cound not find one or more request parameters, did you change the url?'
+                        );
+                    }
+
+                    const html = await (await fetch(solutionUrl)).text();
+                    const parser = new DOMParser();
+                    const solution = parser.parseFromString(html, 'text/html');
+
+                    const code =
+                        solution.querySelector('.highlight code').innerText;
+
+                    const annotations = Array.from(
+                        solution.querySelectorAll('table tbody tr')
+                    ).map(row => {
+                        const columns = row.querySelectorAll('td');
+
+                        if (columns.length === 3) {
+                            const lineText = columns[0].innerText.trim();
+                            const columnText = columns[1].innerText.trim();
+                            const comment = columns[2].innerText.trim();
+
+                            const line = parseRange(lineText);
+                            const column = parseRange(columnText);
+
+                            return { line, column, comment };
+                        }
+                    });
+
+                    return { name, code, language, annotations };
+                };
+            });
+
+            LOADERS.push('markdown-solution');
+        </script>
+
+        <script>
+            const $editor = document.getElementById('editor');
+
+            const url = new URL(location.href);
+            const loader = url.searchParams.get('loader') ?? 'UNKNOWN';
+
+            if (!LOADERS.includes(loader)) {
+                showError(
+                    `Could not find the requested loader "${loader}", did you change the url?`
+                );
+            }
+
+            require(['vs/editor/editor.main', `loader/${loader}`], (
+                _,
+                loader
+            ) => {
+                const getUserPreferredTheme = () =>
+                    window.matchMedia('(prefers-color-scheme: dark)').matches
+                        ? 'vs-dark'
+                        : 'vs-light';
+
+                function createEditor({ name, code, language, annotations }) {
+                    document.title = name;
+                    $editor.innerHTML = '';
+
+                    const editor = monaco.editor.create($editor, {
+                        language,
+                        value: code,
+                        lineNumbers: 'on',
+                        scrollBeyondLastLine: false,
+                        renderValidationDecorations: 'on',
+                        theme: getUserPreferredTheme(),
+                        readOnly: true,
+                        readOnlyMessage: { value: 'Cannot edit this file.' },
+                    });
+
+                    const markers = annotations.map(
+                        ({
+                            line: [startLineNumber, endLineNumber],
+                            column: [startColumn, endColumn],
+                            comment: message,
+                        }) => ({
+                            startLineNumber,
+                            endLineNumber,
+                            startColumn,
+                            endColumn,
+                            message,
+                            severity: monaco.MarkerSeverity.Info,
+                        })
+                    );
+
+                    monaco.editor.setModelMarkers(
+                        editor.getModel(),
+                        'annotations',
+                        markers
+                    );
+                }
+
+                loader(url)
+                    .then(createEditor)
+                    .catch(e => showError(`Could not load the code: ${e}`));
+            });
+        </script>
+    </body>
+</html>
