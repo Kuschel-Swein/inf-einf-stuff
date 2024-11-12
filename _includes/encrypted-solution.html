@@ -17,31 +17,12 @@
 </script>
 
 <script>
-    define('loader', ['cryptoJs'], cryptoJs => {
-        return async key => {
-            const values = await (await fetch('./values.json')).json();
-
-            const decrypt = ciphertext =>
-                cryptoJs.AES.decrypt(ciphertext, key).toString(
-                    cryptoJs.enc.Utf8
-                );
-
-            return {
-                ...values,
-                code: decrypt(values.code),
-                annotations: JSON.parse(decrypt(values.annotations)),
-            };
-        };
-    });
-</script>
-
-<script>
     const $editor = document.getElementById('solution-editor');
 
     const url = new URL(location.href);
     const key = url.searchParams.get('key');
 
-    require(['vs/editor/editor.main', 'loader'], (_, loader) => {
+    require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
         function createEditor({ code, language, annotations }) {
             $editor.innerHTML = '';
 
@@ -78,9 +59,30 @@
             );
         }
 
+        async function loadSolution(key) {
+            const values = await (await fetch('./values.json')).json();
+
+            const decrypt = ciphertext =>
+                cryptoJs.AES.decrypt(ciphertext, key).toString(
+                    cryptoJs.enc.Utf8
+                );
+
+            return {
+                ...values,
+                code: decrypt(values.code),
+                annotations: JSON.parse(decrypt(values.annotations)),
+            };
+        }
+
         if (key) {
             // drop errors silently
-            loader(key).then(createEditor);
+            loadSolution(key).then(createEditor);
         }
     });
+</script>
+
+<script>
+    // "unload" requirejs to prevent other code from breaking
+    window.define = undefined;
+    window.require = undefined;
 </script>
