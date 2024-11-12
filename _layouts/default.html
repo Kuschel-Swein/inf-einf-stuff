@@ -19,7 +19,7 @@
 
       {% if site.github.private != true and site.github.license %}
       <div class="no-print footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
-        Diese Seite ist Open Source. {% github_edit_link "Verbessere diese Seite" %}.
+        Diese Seite ist Open Source. <a href="{{ site.github.repository_url }}/blob/content/{{ page.path }}">Edit this page</a>.
       </div>
       {% endif %}
     </div>
