@@ -24,7 +24,7 @@ jobs:
                   path: content
                   ref: content
 
-            - name: Add Header and Copy Workflow File
+            - name: 'Add Header and Copy Workflow File'
               run: |
                   echo -e "#\n# THIS FILE IS GENERATED AUTOMATICALLY, ONLY CHANGE THE ONE ON THE \`jekyll\` BRANCH!\n#\n" | cat - .github/deploy-pages.yml > content/.github/workflows/deploy-pages.yml
 
