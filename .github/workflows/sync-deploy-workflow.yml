@@ -1,0 +1,46 @@
+name: 'Sync `deploy-pages` Workflow to `content` Branch'
+
+on:
+    push:
+        branches:
+            - jekyll
+
+        paths:
+            - .github/workflows/deploy-pages.yml
+
+jobs:
+    sync-workflow:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 'Checkout Jekyll Branch'
+              uses: actions/checkout@v4
+              with:
+                  ref: jekyll
+
+            - name: 'Checkout Content Branch'
+              uses: actions/checkout@v4
+              with:
+                  path: content
+                  ref: content
+
+            - name: Add Header and Copy Workflow File
+              run: |
+                  echo -e "#\n# THIS FILE IS GENERATED AUTOMATICALLY, ONLY CHANGE THE ONE ON THE \`jekyll\` BRANCH!\n#\n" | cat - .github/deploy-pages.yml > content/.github/workflows/deploy-pages.yml
+
+            - name: 'Set git Config to github-actions'
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: 'Commit and Push Changes'
+              run: |
+                  cd content
+                  git add .github/workflows/deploy-pages.yml
+
+                  if git diff --cached --quiet; then
+                    echo "No changes to commit."
+                  else
+                    git commit -m "Updated \`deploy-pages\` workflow in sync with \`jekyll\`"
+                    git push origin content
+                  fi
