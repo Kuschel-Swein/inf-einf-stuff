@@ -1,6 +1,8 @@
 name: 'Sync `deploy-pages` Workflow to `content` Branch'
 
 on:
+    workflow_dispatch:
+
     push:
         branches:
             - jekyll
