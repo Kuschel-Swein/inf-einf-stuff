@@ -1,4 +1,7 @@
-# DO NOT CHANGE THIS FILE!
+#
+# THIS FILE IS GENERATED AUTOMATICALLY, ONLY CHANGE THE ONE ON THE `jekyll` BRANCH!
+#
+
 name: 'Build and Deploy site to GitHub Pages'
 
 on:
@@ -37,7 +40,6 @@ jobs:
               uses: actions/configure-pages@v5
 
             - name: 'Build'
-
               uses: actions/jekyll-build-pages@v1
 
             - name: 'Upload artifact'
@@ -48,7 +50,7 @@ jobs:
         needs: build
 
         steps:
-            - name: Deploy to GitHub Pages
+            - name: 'Deploy to GitHub Pages'
               id: deployment
               uses: actions/deploy-pages@v4
 
