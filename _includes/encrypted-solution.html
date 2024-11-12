@@ -1,45 +1,35 @@
-<div id="solution-editor">Hier verbirgt sich verschlüsselt die Lösung!</div>
+<div
+    id="solution-editor"
+    style="height: 30vh"
+>
+    Hier verbirgt sich verschlüsselt die Lösung!
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js"></script>
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"
-    integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-></script>
 <script>
     require.config({
         paths: {
             vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs',
+            cryptoJs:
+                'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js',
         },
     });
-
-    const showError = message => {
-        alert(message);
-        location.reload();
-    };
 </script>
 
 <script>
-    define('loader', () => {
-        const parseRange = text => {
-            const [start, end] = text.split('-').map(Number);
-
-            return end ? [start, end] : [start, start];
-        };
-
+    define('loader', ['cryptoJs'], cryptoJs => {
         return async key => {
             const values = await (await fetch('./values.json')).json();
 
             const decrypt = ciphertext =>
-                CryptoJS.AES.decrypt(ciphertext, key).toString(
-                    CryptoJS.enc.Utf8
+                cryptoJs.AES.decrypt(ciphertext, key).toString(
+                    cryptoJs.enc.Utf8
                 );
 
             return {
                 ...values,
                 code: decrypt(values.code),
-                annotations: values.annotations.map(decrypt),
+                annotations: JSON.parse(decrypt(values.annotations)),
             };
         };
     });
@@ -52,8 +42,7 @@
     const key = url.searchParams.get('key');
 
     require(['vs/editor/editor.main', 'loader'], (_, loader) => {
-        function createEditor({ name, code, language, annotations }) {
-            document.title = name;
+        function createEditor({ code, language, annotations }) {
             $editor.innerHTML = '';
 
             const editor = monaco.editor.create($editor, {
@@ -90,9 +79,8 @@
         }
 
         if (key) {
-            loader()
-                .then(createEditor)
-                .catch(e => showError(`Could not load the code: ${e}`));
+            // drop errors silently
+            loader(key).then(createEditor);
         }
     });
 </script>
