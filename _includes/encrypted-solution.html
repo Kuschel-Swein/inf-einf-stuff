@@ -1,8 +1,10 @@
-<div
-    id="solution-editor"
-    style="height: 30vh"
->
-    Hier verbirgt sich verschlüsselt die Lösung!
+<div style="overflow: auto; display: flex">
+    <div
+        id="solution-editor"
+        style="height: 100%; width: 100%"
+    >
+        Hier verbirgt sich verschlüsselt die Lösung!
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js"></script>
@@ -24,6 +26,8 @@
 
     require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
         function createEditor({ code, language, annotations }) {
+            $editor.parentElement.style.border = '1px solid #eaecef';
+            $editor.style.height = '30vh';
             $editor.innerHTML = '';
 
             const editor = monaco.editor.create($editor, {
