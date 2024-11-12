@@ -10,10 +10,6 @@ on:
         paths:
             - .github/workflows/deploy-pages.yml
 
-permissions:
-    contents: write
-    actions: write
-
 jobs:
     sync-workflow:
         runs-on: ubuntu-latest
