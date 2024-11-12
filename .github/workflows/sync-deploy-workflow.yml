@@ -1,4 +1,4 @@
-name: 'Sync `deploy-pages` Workflow to `content` Branch'
+name: 'Sync deploy-pages Workflow to content Branch'
 
 on:
     workflow_dispatch:
