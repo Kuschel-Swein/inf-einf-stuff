@@ -29,6 +29,9 @@ jobs:
                   path: ./content
                   ref: content
 
+            - name: 'Move `content` up to main directory'
+              run: cp -r ./content/* .
+
             - name: 'Setup Pages'
               uses: actions/configure-pages@v5
 
