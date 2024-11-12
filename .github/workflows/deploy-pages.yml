@@ -1,4 +1,3 @@
-# DO NOT CHANGE THIS FILE WITHOUT RUNNING THE `sync-workflow.sh` SCRIPT ON THE `jekyll branch`!
 name: 'Build and Deploy site to GitHub Pages'
 
 on:
