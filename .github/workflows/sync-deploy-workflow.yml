@@ -22,13 +22,13 @@ jobs:
             - name: 'Checkout Jekyll Branch'
               uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.SYNC_WORKFLOW_TOKEN }}
                   ref: jekyll
 
             - name: 'Checkout Content Branch'
               uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.SYNC_WORKFLOW_TOKEN }}
                   path: content
                   ref: content
 
