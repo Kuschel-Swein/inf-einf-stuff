@@ -1,0 +1,57 @@
+# DO NOT CHANGE THIS FILE WITHOUT RUNNING THE `sync-workflow.sh` SCRIPT ON THE `jekyll branch`!
+name: 'Build and Deploy site to GitHub Pages'
+
+on:
+    workflow_dispatch:
+
+    push:
+        branches:
+            - content
+            - jekyll
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 'Checkout `jekyll` branch'
+              uses: actions/checkout@v4
+              with:
+                  ref: jekyll
+
+            - name: 'Checkout `content` branch'
+              uses: actions/checkout@v4
+              with:
+                  path: ./content
+                  ref: content
+
+            - name: 'Move `content` up to main directory'
+              run: cp -r ./content/* .
+
+            - name: 'Setup Pages'
+              uses: actions/configure-pages@v5
+
+            - name: 'Build'
+
+              uses: actions/jekyll-build-pages@v1
+
+            - name: 'Upload artifact'
+              uses: actions/upload-pages-artifact@v3
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build
+
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
+
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
