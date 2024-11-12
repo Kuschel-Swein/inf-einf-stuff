@@ -108,11 +108,11 @@ Ihr Programm sollte sich, je nach Teilaufgabe, wie in den folgenden Beispielen v
 
 Verwenden Sie dazu je nach Teilaufgabe die folgenden Befehle, um Ihr Programm mit `check50` zu überprüfen.
 
--   **Teilaufgabe 1:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a1`
--   **Teilaufgabe 2:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a2`
--   **Teilaufgabe 3:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a3`
--   **Teilaufgabe 4:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a4`
--   **Teilaufgabe 5:** `check50 -l Kuschel-Swein/inf-einf-labs/main/password/check/a5`
+-   **Teilaufgabe 1:** `check50 -l Kuschel-Swein/inf-einf-labs/check/password/a1`
+-   **Teilaufgabe 2:** `check50 -l Kuschel-Swein/inf-einf-labs/check/password/a2`
+-   **Teilaufgabe 3:** `check50 -l Kuschel-Swein/inf-einf-labs/check/password/a3`
+-   **Teilaufgabe 4:** `check50 -l Kuschel-Swein/inf-einf-labs/check/password/a4`
+-   **Teilaufgabe 5:** `check50 -l Kuschel-Swein/inf-einf-labs/check/password/a5`
 
 #### Webbrowser
 
