@@ -1,0 +1,97 @@
+<div id="solution-editor">Hier verbirgt sich verschlüsselt die Lösung!</div>
+
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1-crypto-js.min.js"></script>
+<script>
+    require.config({
+        paths: {
+            vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs',
+        },
+    });
+
+    const showError = message => {
+        alert(message);
+        location.reload();
+    };
+</script>
+
+<script>
+    define('loader', () => {
+        const parseRange = text => {
+            const [start, end] = text.split('-').map(Number);
+
+            return end ? [start, end] : [start, start];
+        };
+
+        return async key => {
+            const values = await (await fetch('./values.json')).json();
+
+            const decrypt = ciphertext =>
+                CryptoJS.AES.decrypt(ciphertext, key).toString(
+                    CryptoJS.enc.Utf8
+                );
+
+            document.getElementById('content').innerHTML = decrypted;
+
+            return {
+                ...values,
+                code: decrypt(values.code),
+                annotations: values.annotations.map(decrypt),
+            };
+        };
+    });
+
+    LOADERS.push('markdown-solution');
+</script>
+
+<script>
+    const $editor = document.getElementById('solution-editor');
+
+    const url = new URL(location.href);
+    const key = url.searchParams.get('key');
+
+    require(['vs/editor/editor.main', `loader`], (_, loader) => {
+        function createEditor({ name, code, language, annotations }) {
+            document.title = name;
+            $editor.innerHTML = '';
+
+            const editor = monaco.editor.create($editor, {
+                language,
+                value: code,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                renderValidationDecorations: 'on',
+                theme: 'vs-light',
+                readOnly: true,
+                readOnlyMessage: { value: 'Cannot edit this file.' },
+            });
+
+            const markers = annotations.map(
+                ({
+                    line: [startLineNumber, endLineNumber],
+                    column: [startColumn, endColumn],
+                    comment: message,
+                }) => ({
+                    startLineNumber,
+                    endLineNumber,
+                    startColumn,
+                    endColumn,
+                    message,
+                    severity: monaco.MarkerSeverity.Info,
+                })
+            );
+
+            monaco.editor.setModelMarkers(
+                editor.getModel(),
+                'annotations',
+                markers
+            );
+        }
+
+        if (key) {
+            loader()
+                .then(createEditor)
+                .catch(e => showError(`Could not load the code: ${e}`));
+        }
+    });
+</script>
