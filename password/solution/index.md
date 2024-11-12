@@ -1,8 +1,12 @@
+---
+layout: solution
+---
+
 # Lösung für Passwort
 
 Hier kann die Lösung gefunden werden, welche wir zusammen im Tutorium erarbeitet haben.
 
-Diese Lösung kann {% include tool/annotated-solution-link.html language="c" name="password.c" content="hier" %} mit Kommentaren angesehen werden.
+{% include encrypted-solution.html %}
 
 ## Code
 
