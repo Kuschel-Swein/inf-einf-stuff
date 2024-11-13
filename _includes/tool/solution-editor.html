@@ -137,20 +137,25 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% raw %}
                             <tr
                                 v-for="(annotation, index) in annotations"
                                 :key="index"
                             >
-                                <td>
-                                    {{ annotation.line[0] }}, {{
-                                    annotation.column[0] }}
+                                <td>  
+                                    {% raw %}
+                                    {{ annotation.line[0] }}, {{ annotation.column[0] }}
+                                    {% endraw %}
                                 </td>
                                 <td>
-                                    {{ annotation.line[1] || '' }}, {{
-                                    annotation.column[1] || '' }}
+                                    {% raw %}
+                                    {{ annotation.line[1] || '' }}, {{ annotation.column[1] || '' }}
+                                    {% endraw %}
                                 </td>
-                                <td>{{ annotation.comment }}</td>
+                                <td>
+                                    {% raw %}
+                                    {{ annotation.comment }}
+                                    {% endraw %}
+                                </td>
                                 <td>
                                     <button @click="removeAnnotation(index)">
                                         Remove
@@ -162,7 +167,6 @@
                                     </button>
                                 </td>
                             </tr>
-                            {% endraw %}
                         </tbody>
                     </table>
                 </figure>
