@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+---
+# process by jekyll
+---
+
+{% raw %}<!DOCTYPE html>{% endraw %}
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -6,14 +10,10 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0"
         />
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/pixelbrackets/gfm-stylesheet/dist/gfm.min.css"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
-        />
+        <!-- prettier-ignore-->
+        <link rel="stylesheet" href="{{ "/assets/lib/gfm-css/gfm.min.css?v=" | append: site.github.build_revision | relative_url }}" />
+        <!-- prettier-ignore-->
+        <link rel="stylesheet" href="{{ "/assets/lib/hljs/github.min.css?v=" | append: site.github.build_revision | relative_url }}" />
         <title>Select markdown file...</title>
         <style>
             html,
@@ -65,14 +65,14 @@
                 accept=".md"
             />
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/marked-highlight@2.2.1/lib/index.umd.js"></script>
+        <script src="{{ "/assets/lib/markedjs/marked-highlight.umd.js?v=" | append: site.github.build_revision | relative_url }}"></script>
         <script
             type="module"
             defer
         >
-            import { Marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
-            import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/+esm';
-            import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/highlight.min.js';
+            import { Marked } from '{{ "/assets/lib/markedjs/marked.esm.js?v=" | append: site.github.build_revision | relative_url }}';
+            import jsYaml from '{{ "/assets/lib/js-yaml/js-yaml.esm.js?v=" | append: site.github.build_revision | relative_url }}';
+            import hljs from '{{ "/assets/lib/hljs/highlight.min.js?v=" | append: site.github.build_revision | relative_url }}';
 
             const FRONT_MATTER_REGEX = /^---\s*\n([\s\S]+?)\n---\s*\n/;
 

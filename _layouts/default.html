@@ -24,7 +24,7 @@
       {% endif %}
     </div>
     <script type="module">
-      import anchors from 'https://cdn.jsdelivr.net/npm/anchor-js@5.0.0/+esm';
+      import anchors from '{{ "/assets/lib/anchor-js/anchor-js.esm.js?v=" | append: site.github.build_revision | relative_url }}';
 
       new anchors().add();
     </script>
