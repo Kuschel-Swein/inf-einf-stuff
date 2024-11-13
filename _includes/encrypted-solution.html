@@ -22,7 +22,7 @@
 
     const url = new URL(location.href);
     const key = url.searchParams.get('key');
-    const source = url.searchParams.get('source') ?? './values.json';
+    const source = url.searchParams.get('source') ?? 'values';
 
     require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
         function createEditor({ code, language, annotations }) {
@@ -65,7 +65,7 @@
         }
 
         async function loadSolution(key) {
-            const values = await (await fetch(source)).json();
+            const values = await (await fetch(`./${source}.json`)).json();
 
             const decrypt = ciphertext =>
                 cryptoJs.AES.decrypt(ciphertext, key).toString(
