@@ -2,7 +2,13 @@
     id="solution-editor"
     style="height: 100%; width: 100%"
 >
-    Hier verbirgt sich verschlüsselt die Lösung!
+    <div style="display: flex; gap: 10px">
+        <span style="font-size: 200%;">🔒</span>
+        <p>
+            <strong style="display:block; font-weight: bold;">Hier verbirgt sich die verschlüsselte Lösung!</strong>
+            <span>Um diese anzuzeigen, wird ein spezieller Link benötigt. Wie du diesen erhalten kannst, wurde im Tutorium mitgeteilt.</span>
+        </p>
+    </div>
 </div>
 
 <script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
@@ -11,20 +17,21 @@
         urlArgs: `v={{ site.github.build_revision }}`,
         paths: {
             vs: '{{ "/assets/lib/monaco" | relative_url }}',
-            cryptoJs:
-                '{{ "/assets/lib/crypto-js/crypto-js.min.js" | relative_url }}',
         },
     });
 </script>
 
-<script>
+<script type="module">
+    import { decrypt } from '{{ "/assets/js/solution.js?v=" | append: site.github.build_revision | relative_url }}';
+
     const $editor = document.getElementById('solution-editor');
 
     const url = new URL(location.href);
     const key = url.searchParams.get('key');
     const source = url.searchParams.get('source') ?? 'values';
 
-    require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
+    // use requirejs for monaco compat
+    require(['vs/editor/editor.main'], () => {
         function createEditor({ code, language, annotations }) {
             $editor.style.outline = '1px solid #eaecef';
             $editor.style.minHeight = '30vh';
@@ -67,15 +74,13 @@
         async function loadSolution(key) {
             const values = await (await fetch(`./${source}.json`)).json();
 
-            const decrypt = ciphertext =>
-                cryptoJs.AES.decrypt(ciphertext, key).toString(
-                    cryptoJs.enc.Utf8
-                );
+            const code = await decrypt(key, values.code);
+            const annotations = await decrypt(key, values.annotations);
 
             return {
                 ...values,
-                code: decrypt(values.code),
-                annotations: JSON.parse(decrypt(values.annotations)),
+                code,
+                annotations: JSON.parse(annotations),
             };
         }
 

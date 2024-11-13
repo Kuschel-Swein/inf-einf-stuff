@@ -172,17 +172,18 @@
             </div>
         </div>
 
-        <script>
+        <script type="module">   
+            import { encrypt, decrypt } from '{{ "/assets/js/solution.js?v=" | append: site.github.build_revision | relative_url }}';
+
             require.config({
                 urlArgs: `v={{ site.github.build_revision }}`,
                 paths: {
                     vs: '{{ "/assets/lib/monaco" | relative_url }}',
-                    cryptoJs:
-                        '{{ "/assets/lib/crypto-js/crypto-js.min.js" | relative_url }}',
                 },
             });
 
-            require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
+            // use requirejs for monaco compat
+            require(['vs/editor/editor.main'], () => {
                 // keep this outside of vue to prevent bricking the reactivity handler
                 let editor = null;
 
@@ -319,17 +320,11 @@
                                 this.language
                             );
                         },
-                        saveSolution() {
+                        async saveSolution() {
                             const code = editor.getValue();
-                            const encryptedCode = cryptoJs.AES.encrypt(
-                                code,
-                                this.encryptionKey
-                            ).toString();
 
-                            const encryptedAnnotations = cryptoJs.AES.encrypt(
-                                JSON.stringify(this.annotations),
-                                this.encryptionKey
-                            ).toString();
+                            const encryptedCode = await encrypt(this.encryptionKey, code);
+                            const encryptedAnnotations = await encrypt(this.encryptionKey, JSON.stringify(this.annotations));
 
                             const solutionData = {
                                 language: this.language,
@@ -362,16 +357,10 @@
 
                             if (this.encryptionKey) {
                                 try {
-                                    const decryptedCode = cryptoJs.AES.decrypt(
-                                        solutionData.code,
-                                        this.encryptionKey
-                                    ).toString(cryptoJs.enc.Utf8);
+                                    const decryptedCode = await decrypt(this.encryptionKey, solutionData.code);
 
                                     const decryptedAnnotations = JSON.parse(
-                                        cryptoJs.AES.decrypt(
-                                            solutionData.annotations,
-                                            this.encryptionKey
-                                        ).toString(cryptoJs.enc.Utf8)
+                                        await decrypt(this.encryptionKey, solutionData.annotations)
                                     );
 
                                     this.code = decryptedCode;
