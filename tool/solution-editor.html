@@ -172,7 +172,7 @@
         <script src="{{ "/assets/lib/vue/vue.global.prod.min.js?v=" | append: site.github.build_revision | relative_url }}"></script>
         <script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
         <script type="module">
-            import { decrypt } from '{{ "/assets/js/solution/encryption.js?v=" | append: site.github.build_revision | relative_url }}';
+            import { encrypt, decrypt } from '{{ "/assets/js/solution/encryption.js?v=" | append: site.github.build_revision | relative_url }}';
             import { createEditor } from '{{ "/assets/js/solution/editor.js?v=" | append: site.github.build_revision | relative_url }}';
 
             // keep this outside of vue to prevent bricking the reactivity handler
