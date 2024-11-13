@@ -137,6 +137,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% raw %}
                             <tr
                                 v-for="(annotation, index) in annotations"
                                 :key="index"
@@ -161,6 +162,7 @@
                                     </button>
                                 </td>
                             </tr>
+                            {% endraw %}
                         </tbody>
                     </table>
                 </figure>
