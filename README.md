@@ -11,3 +11,4 @@ Diese Seite enthält verschiedene Materialien für meine Inf-Einf-Labs.
 ## Tools
 
 -   [Markdown to PDF converter](./tool/markdown-to-pdf)
+-   [Solution File Editor](./tool/solution-editor)
