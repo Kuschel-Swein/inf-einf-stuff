@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>Solution File Editor</title>
+        <link
+            rel="stylesheet"
+            href="{{ "/assets/lib/simple/simple.min.css?v=" | append: site.github.build_revision | relative_url }}"
+        />
+        <script src="{{ "/assets/lib/vue/vue.global.prod.min.js?v=" | append: site.github.build_revision | relative_url }}"></script>
+        <script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
+        <style>
+            body {
+                display: block;
+            }
+
+            figure,
+            table {
+                width: 100% !important;
+            }
+
+            table > tbody > tr > td > button:not(:last-child) {
+                margin-right: 5px;
+            }
+
+            textarea {
+                resize: vertical;
+            }
+
+            #app {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                padding: 20px;
+            }
+
+            .editor-container {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .editor-container #editor {
+                flex-grow: 1;
+                border: 1px solid var(--border);
+            }
+
+            .controls-container {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .controls-container label,
+            .comments-container label {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <h1>Solution File Editor</h1>
+
+            <div class="editor-container">
+                <div
+                    id="editor"
+                    style="min-height: 50vh"
+                ></div>
+
+                <div>
+                    <fieldset class="controls-container">
+                        <legend>Options</legend>
+                        <label
+                            >Language:
+                            <select
+                                v-model="language"
+                                @change="updateLanguage"
+                            >
+                                <option value="c">C</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                            </select>
+                        </label>
+
+                        <label
+                            >Encryption Key:
+                            <input
+                                v-model="encryptionKey"
+                                type="text"
+                                placeholder="busybeaver"
+                            />
+                        </label>
+                        <button @click="saveSolution">Save Encrypted</button>
+                        <button @click="loadSolution">Load Encrypted</button>
+                        <input
+                            type="file"
+                            ref="fileInput"
+                            style="display: none"
+                            @change="handleFileUpload"
+                        />
+                    </fieldset>
+                    <fieldset class="comments-container">
+                        <legend>Comments</legend>
+
+                        <label
+                            >Add Comment:
+                            <textarea
+                                v-model="currentComment"
+                                :disabled="!selectionMade"
+                            ></textarea>
+                        </label>
+                        <button
+                            @click="addComment"
+                            :disabled="!selectionMade"
+                        >
+                            Add Comment
+                        </button>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="annotations-container">
+                <h3>Annotations</h3>
+                <figure>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Start (Line, Col)</th>
+                                <th>End (Line, Col)</th>
+                                <th>Comment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(annotation, index) in annotations"
+                                :key="index"
+                            >
+                                <td>
+                                    {{ annotation.line[0] }}, {{
+                                    annotation.column[0] }}
+                                </td>
+                                <td>
+                                    {{ annotation.line[1] || '' }}, {{
+                                    annotation.column[1] || '' }}
+                                </td>
+                                <td>{{ annotation.comment }}</td>
+                                <td>
+                                    <button @click="removeAnnotation(index)">
+                                        Remove
+                                    </button>
+                                    <button
+                                        @click="revealAnnotation(annotation)"
+                                    >
+                                        Reveal in Editor
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </figure>
+            </div>
+        </div>
+
+        <script>
+            require.config({
+                urlArgs: `v={{ site.github.build_revision }}`,
+                paths: {
+                    vs: '{{ "/assets/lib/monaco" | relative_url }}',
+                    cryptoJs:
+                        '{{ "/assets/lib/crypto-js/crypto-js.min.js" | relative_url }}',
+                },
+            });
+
+            require(['vs/editor/editor.main', 'cryptoJs'], (_, cryptoJs) => {
+                // keep this outside of vue to prevent bricking the reactivity handler
+                let editor = null;
+
+                Vue.createApp({
+                    data() {
+                        return {
+                            language: 'c',
+                            encryptionKey: '',
+                            annotations: [],
+                            code: '// Start coding here\n',
+                            selectionMade: false,
+                            currentComment: '',
+                            unsavedChanges: false,
+                        };
+                    },
+                    mounted() {
+                        window.addEventListener(
+                            'beforeunload',
+                            this.beforeUnload
+                        );
+                        this.initEditor();
+                    },
+                    beforeDestroy() {
+                        window.removeEventListener(
+                            'beforeunload',
+                            this.beforeUnload
+                        );
+                    },
+                    methods: {
+                        initEditor() {
+                            if (editor) {
+                                editor.dispose();
+                            }
+
+                            editor = monaco.editor.create(
+                                document.getElementById('editor'),
+                                {
+                                    value: this.code,
+                                    language: this.language,
+                                    theme: 'vs-light',
+                                    automaticLayout: true,
+                                }
+                            );
+
+                            editor.onDidChangeModelContent(() => {
+                                this.unsavedChanges = true;
+                            });
+
+                            editor.onDidChangeCursorSelection(event => {
+                                const {
+                                    startLineNumber,
+                                    startColumn,
+                                    endLineNumber,
+                                    endColumn,
+                                } = event.selection;
+                                this.selectionMade =
+                                    startLineNumber !== endLineNumber ||
+                                    startColumn !== endColumn;
+                            });
+
+                            this.applyAnnotations();
+                        },
+                        addComment() {
+                            if (!this.selectionMade || !this.currentComment)
+                                return;
+
+                            const selection = editor.getSelection();
+                            const annotation = {
+                                line: [
+                                    selection.startLineNumber,
+                                    selection.endLineNumber,
+                                ],
+                                column: [
+                                    selection.startColumn,
+                                    selection.endColumn,
+                                ],
+                                comment: this.currentComment,
+                            };
+
+                            this.annotations.push(annotation);
+                            this.currentComment = '';
+                            this.selectionMade = false;
+                            this.unsavedChanges = true;
+
+                            this.applyAnnotations();
+                        },
+                        applyAnnotations() {
+                            const markers = this.annotations.map(
+                                annotation => ({
+                                    startLineNumber: annotation.line[0],
+                                    endLineNumber:
+                                        annotation.line[1] ||
+                                        annotation.line[0],
+                                    startColumn: annotation.column[0],
+                                    endColumn:
+                                        annotation.column[1] ||
+                                        annotation.column[0],
+                                    message: annotation.comment,
+                                    severity: monaco.MarkerSeverity.Info,
+                                })
+                            );
+
+                            monaco.editor.setModelMarkers(
+                                editor.getModel(),
+                                'annotations',
+                                markers
+                            );
+                        },
+                        revealAnnotation(annotation) {
+                            const { line, column } = annotation;
+
+                            editor.revealRangeInCenter({
+                                startLineNumber: line[0],
+                                startColumn: column[0],
+                                endLineNumber: line[1] || line[0],
+                                endColumn: column[1] || column[0],
+                            });
+
+                            editor.setSelection({
+                                startLineNumber: line[0],
+                                startColumn: column[0],
+                                endLineNumber: line[1] || line[0],
+                                endColumn: column[1] || column[0],
+                            });
+                        },
+                        removeAnnotation(index) {
+                            this.annotations.splice(index, 1);
+                            this.applyAnnotations();
+                        },
+                        updateLanguage() {
+                            monaco.editor.setModelLanguage(
+                                editor.getModel(),
+                                this.language
+                            );
+                        },
+                        saveSolution() {
+                            const code = editor.getValue();
+                            const encryptedCode = cryptoJs.AES.encrypt(
+                                code,
+                                this.encryptionKey
+                            ).toString();
+
+                            const encryptedAnnotations = cryptoJs.AES.encrypt(
+                                JSON.stringify(this.annotations),
+                                this.encryptionKey
+                            ).toString();
+
+                            const solutionData = {
+                                language: this.language,
+                                code: encryptedCode,
+                                annotations: encryptedAnnotations,
+                            };
+
+                            const blob = new Blob(
+                                [JSON.stringify(solutionData, null, 2)],
+                                { type: 'application/json' }
+                            );
+
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'solution.json';
+                            link.click();
+
+                            URL.revokeObjectURL(url);
+
+                            this.unsavedChanges = false;
+                        },
+                        loadSolution() {
+                            this.$refs.fileInput.click();
+                        },
+                        async handleFileUpload(event) {
+                            const file = event.target.files[0];
+                            const text = await file.text();
+                            const solutionData = JSON.parse(text);
+
+                            if (this.encryptionKey) {
+                                try {
+                                    const decryptedCode = cryptoJs.AES.decrypt(
+                                        solutionData.code,
+                                        this.encryptionKey
+                                    ).toString(cryptoJs.enc.Utf8);
+
+                                    const decryptedAnnotations = JSON.parse(
+                                        cryptoJs.AES.decrypt(
+                                            solutionData.annotations,
+                                            this.encryptionKey
+                                        ).toString(cryptoJs.enc.Utf8)
+                                    );
+
+                                    this.code = decryptedCode;
+                                    this.annotations = decryptedAnnotations;
+                                    this.language = solutionData.language;
+
+                                    this.initEditor();
+
+                                    this.unsavedChanges = false;
+                                } catch (error) {
+                                    alert('Incorrect decryption key.');
+                                }
+                            } else {
+                                alert(
+                                    'Please enter an encryption key to load the file.'
+                                );
+                            }
+                        },
+                        beforeUnload(event) {
+                            if (this.unsavedChanges) {
+                                event.preventDefault();
+                                event.returnValue = '';
+                            }
+                        },
+                    },
+                }).mount('#app');
+            });
+        </script>
+    </body>
+</html>

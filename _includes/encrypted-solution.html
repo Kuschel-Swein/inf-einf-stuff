@@ -5,13 +5,14 @@
     Hier verbirgt sich verschlüsselt die Lösung!
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js"></script>
+<script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
 <script>
     require.config({
+        urlArgs: `v={{ site.github.build_revision }}`,
         paths: {
-            vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs',
+            vs: '{{ "/assets/lib/monaco" | relative_url }}',
             cryptoJs:
-                'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js',
+                '{{ "/assets/lib/crypto-js/crypto-js.min.js" | relative_url }}',
         },
     });
 </script>
