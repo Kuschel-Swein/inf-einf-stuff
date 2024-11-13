@@ -222,7 +222,7 @@
                                 {
                                     value: this.code,
                                     language: this.language,
-                                    theme: 'vs-light',
+                                    theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'vs-dark' : 'vs-light',
                                     automaticLayout: true,
                                 }
                             );
