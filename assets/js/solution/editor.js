@@ -19,6 +19,7 @@ export function createEditor({
                 value,
                 lineNumbers: 'on',
                 automaticLayout: true,
+                scrollBeyondLastLine: false,
                 renderValidationDecorations: 'on',
                 theme: matchMedia('(prefers-color-scheme: dark)').matches
                     ? 'vs-dark'
