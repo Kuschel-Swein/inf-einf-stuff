@@ -1,3 +1,6 @@
+---
+# process by jekyll
+---
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -137,24 +140,19 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% raw %}
                             <tr
                                 v-for="(annotation, index) in annotations"
                                 :key="index"
                             >
                                 <td>  
-                                    {% raw %}
                                     {{ annotation.line[0] }}, {{ annotation.column[0] }}
-                                    {% endraw %}
                                 </td>
                                 <td>
-                                    {% raw %}
                                     {{ annotation.line[1] || '' }}, {{ annotation.column[1] || '' }}
-                                    {% endraw %}
                                 </td>
                                 <td>
-                                    {% raw %}
                                     {{ annotation.comment }}
-                                    {% endraw %}
                                 </td>
                                 <td>
                                     <button @click="removeAnnotation(index)">
@@ -167,6 +165,7 @@
                                     </button>
                                 </td>
                             </tr>
+                            {% endraw %}
                         </tbody>
                     </table>
                 </figure>
