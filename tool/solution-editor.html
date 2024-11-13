@@ -1,6 +1,7 @@
 ---
 # process by jekyll
 ---
+
 {% raw %}<!DOCTYPE html>{% endraw %}
 <html lang="en">
     <head>
@@ -10,12 +11,8 @@
             content="width=device-width, initial-scale=1.0"
         />
         <title>Solution File Editor</title>
-        <link
-            rel="stylesheet"
-            href="{{ "/assets/lib/simple/simple.min.css?v=" | append: site.github.build_revision | relative_url }}"
-        />
-        <script src="{{ "/assets/lib/vue/vue.global.prod.min.js?v=" | append: site.github.build_revision | relative_url }}"></script>
-        <script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
+        <!-- prettier-ignore -->
+        <link rel="stylesheet" href="{{ "/assets/lib/simple/simple.min.css?v=" | append: site.github.build_revision | relative_url }}" />
         <style>
             body {
                 display: block;
@@ -91,7 +88,7 @@
                         </label>
 
                         <label
-                            >Encryption Key:
+                            ><div>Encryption Key:</div>
                             <input
                                 v-model="encryptionKey"
                                 type="text"
@@ -145,15 +142,15 @@
                                 v-for="(annotation, index) in annotations"
                                 :key="index"
                             >
-                                <td>  
-                                    {{ annotation.line[0] }}, {{ annotation.column[0] }}
+                                <td>
+                                    {{ annotation.line[0] }}, {{
+                                    annotation.column[0] }}
                                 </td>
                                 <td>
-                                    {{ annotation.line[1] || '' }}, {{ annotation.column[1] || '' }}
+                                    {{ annotation.line[1] || '' }}, {{
+                                    annotation.column[1] || '' }}
                                 </td>
-                                <td>
-                                    {{ annotation.comment }}
-                                </td>
+                                <td>{{ annotation.comment }}</td>
                                 <td>
                                     <button @click="removeAnnotation(index)">
                                         Remove
@@ -172,222 +169,216 @@
             </div>
         </div>
 
-        <script type="module">   
-            import { encrypt, decrypt } from '{{ "/assets/js/solution.js?v=" | append: site.github.build_revision | relative_url }}';
+        <script src="{{ "/assets/lib/vue/vue.global.prod.min.js?v=" | append: site.github.build_revision | relative_url }}"></script>
+        <script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
+        <script type="module">
+            import { decrypt } from '{{ "/assets/js/solution/encryption.js?v=" | append: site.github.build_revision | relative_url }}';
+            import { createEditor } from '{{ "/assets/js/solution/editor.js?v=" | append: site.github.build_revision | relative_url }}';
 
-            require.config({
-                urlArgs: `v={{ site.github.build_revision }}`,
-                paths: {
-                    vs: '{{ "/assets/lib/monaco" | relative_url }}',
+            // keep this outside of vue to prevent bricking the reactivity handler
+            let editor;
+            let monaco;
+
+            Vue.createApp({
+                data() {
+                    return {
+                        language: 'c',
+                        encryptionKey: '',
+                        annotations: [],
+                        code: '// Start coding here\n',
+                        selectionMade: false,
+                        currentComment: '',
+                        unsavedChanges: false,
+                    };
                 },
-            });
+                mounted() {
+                    window.addEventListener('beforeunload', this.beforeUnload);
 
-            // use requirejs for monaco compat
-            require(['vs/editor/editor.main'], () => {
-                // keep this outside of vue to prevent bricking the reactivity handler
-                let editor = null;
+                    this.initEditor();
+                },
+                methods: {
+                    async initEditor() {
+                        if (editor) {
+                            editor.dispose();
+                        }
 
-                Vue.createApp({
-                    data() {
-                        return {
-                            language: 'c',
-                            encryptionKey: '',
-                            annotations: [],
-                            code: '// Start coding here\n',
-                            selectionMade: false,
-                            currentComment: '',
-                            unsavedChanges: false,
-                        };
-                    },
-                    mounted() {
-                        window.addEventListener(
-                            'beforeunload',
-                            this.beforeUnload
-                        );
-                        this.initEditor();
-                    },
-                    beforeDestroy() {
-                        window.removeEventListener(
-                            'beforeunload',
-                            this.beforeUnload
-                        );
-                    },
-                    methods: {
-                        initEditor() {
-                            if (editor) {
-                                editor.dispose();
-                            }
-
-                            editor = monaco.editor.create(
-                                document.getElementById('editor'),
-                                {
-                                    value: this.code,
-                                    language: this.language,
-                                    theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'vs-dark' : 'vs-light',
-                                    automaticLayout: true,
-                                }
-                            );
-
-                            editor.onDidChangeModelContent(() => {
-                                this.unsavedChanges = true;
-                            });
-
-                            editor.onDidChangeCursorSelection(event => {
-                                const {
-                                    startLineNumber,
-                                    startColumn,
-                                    endLineNumber,
-                                    endColumn,
-                                } = event.selection;
-                                
-                                this.selectionMade =
-                                    startLineNumber !== endLineNumber ||
-                                    startColumn !== endColumn;
-                            });
-
-                            this.applyAnnotations();
-                        },
-                        addComment() {
-                            if (!this.selectionMade || !this.currentComment)
-                                return;
-
-                            const selection = editor.getSelection();
-                            const annotation = {
-                                line: [
-                                    selection.startLineNumber,
-                                    selection.endLineNumber,
-                                ],
-                                column: [
-                                    selection.startColumn,
-                                    selection.endColumn,
-                                ],
-                                comment: this.currentComment,
-                            };
-
-                            this.annotations.push(annotation);
-                            this.currentComment = '';
-                            this.selectionMade = false;
-                            this.unsavedChanges = true;
-
-                            this.applyAnnotations();
-                        },
-                        applyAnnotations() {
-                            const markers = this.annotations.map(
-                                annotation => ({
-                                    startLineNumber: annotation.line[0],
-                                    endLineNumber:
-                                        annotation.line[1] ||
-                                        annotation.line[0],
-                                    startColumn: annotation.column[0],
-                                    endColumn:
-                                        annotation.column[1] ||
-                                        annotation.column[0],
-                                    message: annotation.comment,
-                                    severity: monaco.MarkerSeverity.Info,
-                                })
-                            );
-
-                            monaco.editor.setModelMarkers(
-                                editor.getModel(),
-                                'annotations',
-                                markers
-                            );
-                        },
-                        revealAnnotation(annotation) {
-                            const { line, column } = annotation;
-
-                            editor.revealRangeInCenter({
-                                startLineNumber: line[0],
-                                startColumn: column[0],
-                                endLineNumber: line[1] || line[0],
-                                endColumn: column[1] || column[0],
-                            });
-
-                            editor.setSelection({
-                                startLineNumber: line[0],
-                                startColumn: column[0],
-                                endLineNumber: line[1] || line[0],
-                                endColumn: column[1] || column[0],
-                            });
-                        },
-                        removeAnnotation(index) {
-                            this.annotations.splice(index, 1);
-                            this.applyAnnotations();
-                        },
-                        updateLanguage() {
-                            monaco.editor.setModelLanguage(
-                                editor.getModel(),
-                                this.language
-                            );
-                        },
-                        async saveSolution() {
-                            const code = editor.getValue();
-
-                            const encryptedCode = await encrypt(this.encryptionKey, code);
-                            const encryptedAnnotations = await encrypt(this.encryptionKey, JSON.stringify(this.annotations));
-
-                            const solutionData = {
+                        [editor, monaco] = await createEditor({
+                            element: document.getElementById('editor'),
+                            options: {
+                                value: this.code,
                                 language: this.language,
-                                code: encryptedCode,
-                                annotations: encryptedAnnotations,
-                            };
+                            },
+                            buildRevision: '{{ site.github.build_revision }}',
+                            librarySource:
+                                '{{ "/assets/lib/monaco" | relative_url }}',
+                        });
 
-                            const blob = new Blob(
-                                [JSON.stringify(solutionData, null, 2)],
-                                { type: 'application/json' }
-                            );
+                        editor.onDidChangeModelContent(() => {
+                            this.unsavedChanges = true;
+                        });
 
-                            const url = URL.createObjectURL(blob);
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.download = 'solution.json';
-                            link.click();
+                        editor.onDidChangeCursorSelection(event => {
+                            const {
+                                startLineNumber,
+                                startColumn,
+                                endLineNumber,
+                                endColumn,
+                            } = event.selection;
 
-                            URL.revokeObjectURL(url);
+                            this.selectionMade =
+                                startLineNumber !== endLineNumber ||
+                                startColumn !== endColumn;
+                        });
 
-                            this.unsavedChanges = false;
-                        },
-                        loadSolution() {
-                            this.$refs.fileInput.click();
-                        },
-                        async handleFileUpload(event) {
-                            const file = event.target.files[0];
-                            const text = await file.text();
-                            const solutionData = JSON.parse(text);
-
-                            if (this.encryptionKey) {
-                                try {
-                                    const decryptedCode = await decrypt(this.encryptionKey, solutionData.code);
-
-                                    const decryptedAnnotations = JSON.parse(
-                                        await decrypt(this.encryptionKey, solutionData.annotations)
-                                    );
-
-                                    this.code = decryptedCode;
-                                    this.annotations = decryptedAnnotations;
-                                    this.language = solutionData.language;
-
-                                    this.initEditor();
-
-                                    this.unsavedChanges = false;
-                                } catch (error) {
-                                    alert('Incorrect decryption key.');
-                                }
-                            } else {
-                                alert(
-                                    'Please enter an encryption key to load the file.'
-                                );
-                            }
-                        },
-                        beforeUnload(event) {
-                            if (this.unsavedChanges) {
-                                event.preventDefault();
-                                event.returnValue = '';
-                            }
-                        },
+                        this.applyAnnotations();
                     },
-                }).mount('#app');
-            });
+                    addComment() {
+                        if (!this.selectionMade || !this.currentComment) return;
+
+                        const selection = editor.getSelection();
+                        const annotation = {
+                            line: [
+                                selection.startLineNumber,
+                                selection.endLineNumber,
+                            ],
+                            column: [
+                                selection.startColumn,
+                                selection.endColumn,
+                            ],
+                            comment: this.currentComment,
+                        };
+
+                        this.annotations.push(annotation);
+                        this.currentComment = '';
+                        this.selectionMade = false;
+                        this.unsavedChanges = true;
+
+                        this.applyAnnotations();
+                    },
+                    applyAnnotations() {
+                        const markers = this.annotations.map(annotation => ({
+                            startLineNumber: annotation.line[0],
+                            endLineNumber:
+                                annotation.line[1] || annotation.line[0],
+                            startColumn: annotation.column[0],
+                            endColumn:
+                                annotation.column[1] || annotation.column[0],
+                            message: annotation.comment,
+                            severity: monaco.MarkerSeverity.Info,
+                        }));
+
+                        monaco.editor.setModelMarkers(
+                            editor.getModel(),
+                            'annotations',
+                            markers
+                        );
+                    },
+                    revealAnnotation(annotation) {
+                        const { line, column } = annotation;
+
+                        editor.revealRangeInCenter({
+                            startLineNumber: line[0],
+                            startColumn: column[0],
+                            endLineNumber: line[1] || line[0],
+                            endColumn: column[1] || column[0],
+                        });
+
+                        editor.setSelection({
+                            startLineNumber: line[0],
+                            startColumn: column[0],
+                            endLineNumber: line[1] || line[0],
+                            endColumn: column[1] || column[0],
+                        });
+                    },
+                    removeAnnotation(index) {
+                        this.annotations.splice(index, 1);
+                        this.applyAnnotations();
+                    },
+                    updateLanguage() {
+                        monaco.editor.setModelLanguage(
+                            editor.getModel(),
+                            this.language
+                        );
+                    },
+                    async saveSolution() {
+                        const code = editor.getValue();
+
+                        const encryptedCode = await encrypt(
+                            this.encryptionKey,
+                            code
+                        );
+                        const encryptedAnnotations = await encrypt(
+                            this.encryptionKey,
+                            JSON.stringify(this.annotations)
+                        );
+
+                        const solutionData = {
+                            language: this.language,
+                            code: encryptedCode,
+                            annotations: encryptedAnnotations,
+                        };
+
+                        const blob = new Blob(
+                            [JSON.stringify(solutionData, null, 2)],
+                            { type: 'application/json' }
+                        );
+
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'solution.json';
+                        link.click();
+
+                        URL.revokeObjectURL(url);
+
+                        this.unsavedChanges = false;
+                    },
+                    loadSolution() {
+                        this.$refs.fileInput.click();
+                    },
+                    async handleFileUpload(event) {
+                        const file = event.target.files[0];
+                        const text = await file.text();
+                        const solutionData = JSON.parse(text);
+
+                        if (this.encryptionKey) {
+                            try {
+                                const decryptedCode = await decrypt(
+                                    this.encryptionKey,
+                                    solutionData.code
+                                );
+
+                                const decryptedAnnotations = JSON.parse(
+                                    await decrypt(
+                                        this.encryptionKey,
+                                        solutionData.annotations
+                                    )
+                                );
+
+                                this.code = decryptedCode;
+                                this.annotations = decryptedAnnotations;
+                                this.language = solutionData.language;
+
+                                await this.initEditor();
+
+                                this.unsavedChanges = false;
+                            } catch (error) {
+                                alert('Incorrect decryption key.');
+                            }
+                        } else {
+                            alert(
+                                'Please enter an encryption key to load the file.'
+                            );
+                        }
+                    },
+                    beforeUnload(event) {
+                        if (this.unsavedChanges) {
+                            event.preventDefault();
+                            event.returnValue = '';
+                        }
+                    },
+                },
+            }).mount('#app');
         </script>
     </body>
 </html>

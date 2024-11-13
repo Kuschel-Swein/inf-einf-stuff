@@ -79,3 +79,30 @@ export async function decrypt(password, payloadText) {
 
     return decodeFromUtf8(plainText);
 }
+
+class EncryptedSolutionElement extends HTMLElement {
+    element;
+
+    constructor() {
+        super();
+
+        this.element = document.createElement('p');
+        this.element.textContent = 'foo';
+    }
+
+    connectedCallback() {
+        this.setupShadowRoot();
+    }
+
+    setupShadowRoot() {
+        if (this.shadowRoot != null) {
+            return;
+        }
+
+        const shadow = this.attachShadow({ mode: 'open' });
+
+        shadow.append(this.element);
+    }
+}
+
+window.customElements.define('encrypted-solution', EncryptedSolutionElement);

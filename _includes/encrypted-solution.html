@@ -3,26 +3,23 @@
     style="height: 100%; width: 100%"
 >
     <div style="display: flex; gap: 10px">
-        <span style="font-size: 200%;">🔒</span>
+        <span style="font-size: 200%">🔒</span>
         <p>
-            <strong style="display:block; font-weight: bold;">Hier verbirgt sich die verschlüsselte Lösung!</strong>
-            <span>Um diese anzuzeigen, wird ein spezieller Link benötigt. Wie du diesen erhalten kannst, wurde im Tutorium mitgeteilt.</span>
+            <strong style="display: block; font-weight: bold"
+                >Hier verbirgt sich die verschlüsselte Lösung!</strong
+            >
+            <span
+                >Um diese anzuzeigen, wird ein spezieller Link benötigt. Wie du
+                diesen erhalten kannst, wurde im Tutorium mitgeteilt.</span
+            >
         </p>
     </div>
 </div>
 
 <script src="{{ "/assets/lib/monaco/loader.js?v=" | append: site.github.build_revision | relative_url }}"></script>
-<script>
-    require.config({
-        urlArgs: `v={{ site.github.build_revision }}`,
-        paths: {
-            vs: '{{ "/assets/lib/monaco" | relative_url }}',
-        },
-    });
-</script>
-
 <script type="module">
-    import { decrypt } from '{{ "/assets/js/solution.js?v=" | append: site.github.build_revision | relative_url }}';
+    import { decrypt } from '{{ "/assets/js/solution/encryption.js?v=" | append: site.github.build_revision | relative_url }}';
+    import { createEditor } from '{{ "/assets/js/solution/editor.js?v=" | append: site.github.build_revision | relative_url }}';
 
     const $editor = document.getElementById('solution-editor');
 
@@ -30,63 +27,55 @@
     const key = url.searchParams.get('key');
     const source = url.searchParams.get('source') ?? 'values';
 
-    // use requirejs for monaco compat
-    require(['vs/editor/editor.main'], () => {
-        function createEditor({ code, language, annotations }) {
-            $editor.style.outline = '1px solid #eaecef';
-            $editor.style.minHeight = '30vh';
-            $editor.innerHTML = '';
+    async function setupEditor({ code, language, annotations }) {
+        $editor.style.outline = '1px solid #eaecef';
+        $editor.style.minHeight = '30vh';
+        $editor.innerHTML = '';
 
-            const editor = monaco.editor.create($editor, {
-                language,
-                value: code,
-                lineNumbers: 'on',
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                renderValidationDecorations: 'on',
-                theme: 'vs-light',
-                readOnly: true,
-                readOnlyMessage: { value: 'Cannot edit this file.' },
-            });
+        const [editor, monaco] = await createEditor({
+            element: $editor,
+            options: { value: code, language, readOnly: true },
+            buildRevision: '{{ site.github.build_revision }}',
+            librarySource: '{{ "/assets/lib/monaco" | relative_url }}',
+        });
 
-            const markers = annotations.map(
-                ({
-                    line: [startLineNumber, endLineNumber],
-                    column: [startColumn, endColumn],
-                    comment: message,
-                }) => ({
-                    startLineNumber,
-                    endLineNumber,
-                    startColumn,
-                    endColumn,
-                    message,
-                    severity: monaco.MarkerSeverity.Hint,
-                })
-            );
+        const markers = annotations.map(
+            ({
+                line: [startLineNumber, endLineNumber],
+                column: [startColumn, endColumn],
+                comment: message,
+            }) => ({
+                startLineNumber,
+                endLineNumber,
+                startColumn,
+                endColumn,
+                message,
+                severity: monaco.MarkerSeverity.Hint,
+            })
+        );
 
-            monaco.editor.setModelMarkers(
-                editor.getModel(),
-                'annotations',
-                markers
-            );
-        }
+        monaco.editor.setModelMarkers(
+            editor.getModel(),
+            'annotations',
+            markers
+        );
+    }
 
-        async function loadSolution(key) {
-            const values = await (await fetch(`./${source}.json`)).json();
+    async function loadSolution(key) {
+        const values = await (await fetch(`./${source}.json`)).json();
 
-            const code = await decrypt(key, values.code);
-            const annotations = await decrypt(key, values.annotations);
+        const code = await decrypt(key, values.code);
+        const annotations = await decrypt(key, values.annotations);
 
-            return {
-                ...values,
-                code,
-                annotations: JSON.parse(annotations),
-            };
-        }
+        return {
+            ...values,
+            code,
+            annotations: JSON.parse(annotations),
+        };
+    }
 
-        if (key) {
-            // drop errors silently
-            loadSolution(key).then(createEditor);
-        }
-    });
+    if (key) {
+        // drop errors silently
+        loadSolution(key).then(setupEditor);
+    }
 </script>
