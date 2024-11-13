@@ -1,5 +1,9 @@
 remote_theme: pages-themes/primer@v0.6.0
 lang: 'de-DE'
 
+exclude:
+  - preview.sh
+  
 plugins:
- - jekyll-remote-theme
+  - jekyll-remote-theme
+  - gemfile

@@ -267,13 +267,16 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (1.8.0)
     uri (1.0.1)
+    wdm (0.2.0)
     webrick (1.9.0)
 
 PLATFORMS
   x64-mingw-ucrt
 
 DEPENDENCIES
+  faraday (~> 2.7, >= 2.7.11)
   github-pages
+  wdm (>= 0.1.0)
 
 BUNDLED WITH
    2.5.22
