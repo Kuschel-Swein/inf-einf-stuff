@@ -1,3 +1,9 @@
+> [!IMPORTANT]
+> This repository has been archived, the new repositories can be found over at the [inf-lab-dev](https://github.com/inf-lab-dev) organization.
+> Some things in this repository might thus be outdated or inaccurate.
+>
+> It only remains (for this semester) to not brick any links or `check50` calls.
+
 # inf-einf-labs
 
 This repository consists of various branches that empower the [inf-lab.dev](https://inf-lab.dev) site. This is mainly done for a nice separation of concerns.
